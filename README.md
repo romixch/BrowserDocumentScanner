@@ -1,5 +1,11 @@
 # Prototype: Document Scanner im Browser
 
+## Screenshots
+
+![Screenshot 1](docs/screenshot1.jpg)
+![Screenshot 2](docs/screenshot2.jpg)
+![Screenshot 3](docs/screenshot3.jpg)
+
 ## Anwendung starten
 
 1. `run.sh` ausführen.

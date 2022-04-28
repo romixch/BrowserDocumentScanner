@@ -35,6 +35,8 @@ imgElement.onload = function() {
   // apply gauss filter (make it blurry)
   let ksize = new cv.Size(5, 5);
   cv.GaussianBlur(dst, dst, ksize, 0, 0, cv.BORDER_DEFAULT);
+  cv.GaussianBlur(dst, dst, ksize, 0, 0, cv.BORDER_DEFAULT);
+  cv.GaussianBlur(dst, dst, ksize, 0, 0, cv.BORDER_DEFAULT);
 
   // apply canny filter
   cv.Canny(dst, dst, 50, 100, 3, true);
