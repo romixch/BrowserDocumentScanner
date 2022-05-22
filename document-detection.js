@@ -5,6 +5,7 @@ const processImage = function (canvas) {
 
     // make it gray scale
     cv.cvtColor(src, dst, cv.COLOR_RGB2GRAY);
+    src.delete();
 
     // apply gauss filter (make it blurry)
     let ksize = new cv.Size(5, 5);
@@ -28,6 +29,7 @@ const processImage = function (canvas) {
     console.log("contour size", contours.size());
     const [rectangleContour, rectangleApprox] = findBiggestRectangle(contours)
     cv.drawContours(origin, contours, -1, [0, 255, 0, 255], 1, cv.LINE_8, hierarchy, 100);
+    dst.delete();
 
     if (rectangleContour) {
         console.log(rectangleContour);
@@ -49,6 +51,7 @@ const processImage = function (canvas) {
 
     // show the image
     cv.imshow('canvasOutput', origin);
+    origin.delete();
 };
 
 function findBiggestRectangle(contours) {
