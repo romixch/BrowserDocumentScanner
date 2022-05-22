@@ -12,7 +12,7 @@
   <p id="status">OpenCV.js is loading...</p>
   <div>
     <video id="video" playsinline autoplay></video><br />
-    <button id="snap">Capture</button><br />
+    <button id="toggleProcessing">toggle processing</button><br />
     <canvas style="display:none" id="canvas" width="1280" height="720"></canvas>
   </div>
   <div style="display: flex; flex-direction: row; flex-wrap: nowrap;">
@@ -30,6 +30,7 @@
 
     let videoOn = false;
     let opencvReady = false;
+    let conversionOn = false;
 
     async function captureVideo() {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -44,8 +45,10 @@
       context.drawImage(video, 0, 0, 1280, 720);
       processImage(canvas);
     }
-    const snap = document.getElementById("snap");
-    snap.addEventListener('click', convertCapturedImage);
+    const toggleProcessing = document.getElementById("toggleProcessing");
+    toggleProcessing.addEventListener('click', () => {
+      conversionOn = !conversionOn;
+    });
     captureVideo();
 
     function onOpenCvReady() {
@@ -55,10 +58,10 @@
 
     setInterval(() => {
       console.log('interval', videoOn, opencvReady);
-      if (videoOn && opencvReady) {
+      if (videoOn && opencvReady && conversionOn) {
         convertCapturedImage();
       }
-    }, 100);
+    }, 200);
 
   </script>
   <script async src="opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
