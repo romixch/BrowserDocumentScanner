@@ -30,9 +30,10 @@ const processImage = function (canvas) {
     const [rectangleContour, rectangleApprox] = findBiggestRectangle(contours)
     cv.drawContours(origin, contours, -1, [0, 255, 0, 255], 1, cv.LINE_8, hierarchy, 100);
     dst.delete();
+    contours.delete();
+    hierarchy.delete();
 
     if (rectangleContour) {
-        console.log(rectangleContour);
         var pos = 0;
         const p1 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
         const p2 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
@@ -46,6 +47,7 @@ const processImage = function (canvas) {
         console.log(rectangleApprox.row(1).data);
         console.log(rectangleApprox.row(2).data);
         console.log(rectangleApprox.row(3).data);
+        rectangleApprox.delete();
     }
 
 
@@ -68,7 +70,12 @@ function findBiggestRectangle(contours) {
             if (approx.total() === 4) {
                 biggestIndex = i;
                 biggestRectangleArea = currentRectangleArea;
+                if (biggestApprox) {
+                    biggestApprox.delete();
+                }
                 biggestApprox = approx;
+            } else {
+                approx.delete();
             }
         }
     }
