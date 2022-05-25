@@ -3,9 +3,8 @@ const processImage = function (canvas) {
     let dst = new cv.Mat();
     let origin = src.clone();
 
-    // make it gray scale
+    // make it let dst = new cv.Mat();gray scale
     cv.cvtColor(src, dst, cv.COLOR_RGB2GRAY);
-    src.delete();
 
     // apply gauss filter (make it blurry)
     let ksize = new cv.Size(5, 5);
@@ -43,10 +42,10 @@ const processImage = function (canvas) {
         cv.line(origin, p2, p3, [255, 50, 50, 255], 4);
         cv.line(origin, p3, p4, [255, 50, 50, 255], 4);
         cv.line(origin, p4, p1, [255, 50, 50, 255], 4);
-        console.log(rectangleApprox.row(0).data);
-        console.log(rectangleApprox.row(1).data);
-        console.log(rectangleApprox.row(2).data);
-        console.log(rectangleApprox.row(3).data);
+        let transformedImage = new cv.Mat();
+        transform(src, transformedImage, rectangleApprox);
+        cv.imshow('transformedOutput', transformedImage)
+        transformedImage.delete();
         rectangleApprox.delete();
     }
 
@@ -54,6 +53,7 @@ const processImage = function (canvas) {
     // show the image
     cv.imshow('canvasOutput', origin);
     origin.delete();
+    src.delete();
 };
 
 function findBiggestRectangle(contours) {
@@ -80,4 +80,38 @@ function findBiggestRectangle(contours) {
         }
     }
     return [contours.get(biggestIndex), biggestApprox];
+}
+
+function transform(sourceImage, destinationImage, rectangleApprox) {
+    var pos = 0;
+    const corner1 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
+    const corner2 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
+    const corner3 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
+    const corner4 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
+
+    //Order the corners
+    let cornerArray = [{ corner: corner1 }, { corner: corner2 }, { corner: corner3 }, { corner: corner4 }];
+    //Sort by Y position (to get top-down)
+    cornerArray.sort((item1, item2) => { return (item1.corner.y < item2.corner.y) ? -1 : (item1.corner.y > item2.corner.y) ? 1 : 0; }).slice(0, 5);
+
+    //Determine left/right based on x position of top and bottom 2
+    let tl = cornerArray[0].corner.x < cornerArray[1].corner.x ? cornerArray[0] : cornerArray[1];
+    let tr = cornerArray[0].corner.x > cornerArray[1].corner.x ? cornerArray[0] : cornerArray[1];
+    let bl = cornerArray[2].corner.x < cornerArray[3].corner.x ? cornerArray[2] : cornerArray[3];
+    let br = cornerArray[2].corner.x > cornerArray[3].corner.x ? cornerArray[2] : cornerArray[3];
+
+    //Calculate the max width/height
+    let widthBottom = Math.hypot(br.corner.x - bl.corner.x, br.corner.y - bl.corner.y);
+    let widthTop = Math.hypot(tr.corner.x - tl.corner.x, tr.corner.y - tl.corner.y);
+    let theWidth = (widthBottom > widthTop) ? widthBottom : widthTop;
+    let heightRight = Math.hypot(tr.corner.x - br.corner.x, tr.corner.y - br.corner.y);
+    let heightLeft = Math.hypot(tl.corner.x - bl.corner.x, tr.corner.y - bl.corner.y);
+    let theHeight = (heightRight > heightLeft) ? heightRight : heightLeft;
+
+    //Transform!
+    let finalDestCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [0, 0, theWidth - 1, 0, theWidth - 1, theHeight - 1, 0, theHeight - 1]); //
+    let srcCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [tl.corner.x, tl.corner.y, tr.corner.x, tr.corner.y, br.corner.x, br.corner.y, bl.corner.x, bl.corner.y]);
+    let dsize = new cv.Size(theWidth, theHeight);
+    let M = cv.getPerspectiveTransform(srcCoords, finalDestCoords)
+    cv.warpPerspective(sourceImage, destinationImage, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
 }
