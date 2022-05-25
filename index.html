@@ -11,17 +11,15 @@
   <h2>Document detection</h2>
   <p id="status">OpenCV.js is loading...</p>
   <div>
-    <video id="video" playsinline autoplay></video><br />
+    <video style="max-width: 90vw;" id="video" playsinline autoplay></video><br />
     <button id="toggleProcessing">toggle processing</button><br />
     <canvas style="display:none" id="canvas" width="1280" height="720"></canvas>
   </div>
-  <div style="display: flex; flex-direction: row; flex-wrap: nowrap;">
-    <div>
-      <canvas id="canvasOutput" style="max-width: 50vw;"></canvas>
-    </div>
-    <div>
-      <canvas id="transformedOutput" style="max-width: 50vw;"></canvas>
-    </div>
+  <div>
+    <canvas id="canvasOutput" style="max-width: 90vw;"></canvas>
+  </div>
+  <div>
+    <canvas id="transformedOutput" style="max-width: 90vw;"></canvas>
   </div>
   <script type="text/javascript">
     const constraints = {
@@ -65,7 +63,7 @@
       if (videoOn && opencvReady && conversionOn) {
         convertCapturedImage();
       }
-    }, 5000);
+    }, 1000);
 
   </script>
   <script async src="opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
