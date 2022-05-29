@@ -32,20 +32,18 @@ const processImage = function (canvas) {
     contours.delete();
     hierarchy.delete();
 
+    const documentCoords = {};
+
     if (rectangleContour) {
         var pos = 0;
-        const p1 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
-        const p2 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
-        const p3 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
-        const p4 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
-        cv.line(origin, p1, p2, [255, 50, 50, 255], 4);
-        cv.line(origin, p2, p3, [255, 50, 50, 255], 4);
-        cv.line(origin, p3, p4, [255, 50, 50, 255], 4);
-        cv.line(origin, p4, p1, [255, 50, 50, 255], 4);
-        let transformedImage = new cv.Mat();
-        transform(src, transformedImage, rectangleApprox);
-        cv.imshow('transformedOutput', transformedImage)
-        transformedImage.delete();
+        documentCoords.p1 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
+        documentCoords.p2 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
+        documentCoords.p3 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
+        documentCoords.p4 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
+        cv.line(origin, documentCoords.p1, documentCoords.p2, [255, 50, 50, 255], 4);
+        cv.line(origin, documentCoords.p2, documentCoords.p3, [255, 50, 50, 255], 4);
+        cv.line(origin, documentCoords.p3, documentCoords.p4, [255, 50, 50, 255], 4);
+        cv.line(origin, documentCoords.p4, documentCoords.p1, [255, 50, 50, 255], 4);
         rectangleApprox.delete();
     }
 
@@ -54,6 +52,7 @@ const processImage = function (canvas) {
     cv.imshow('canvasOutput', origin);
     origin.delete();
     src.delete();
+    return documentCoords;
 };
 
 function findBiggestRectangle(contours) {
@@ -82,15 +81,16 @@ function findBiggestRectangle(contours) {
     return [contours.get(biggestIndex), biggestApprox];
 }
 
-function transform(sourceImage, destinationImage, rectangleApprox) {
-    var pos = 0;
-    const corner1 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
-    const corner2 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
-    const corner3 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
-    const corner4 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
+function cutOutDocument(src, documentCoords) {
+    let transformedImage = new cv.Mat();
+    transform(src, transformedImage, documentCoords);
+    cv.imshow('transformedOutput', transformedImage)
+    transformedImage.delete();
+}
 
+function transform(sourceImage, destinationImage, documentCoords) {
     //Order the corners
-    let cornerArray = [{ corner: corner1 }, { corner: corner2 }, { corner: corner3 }, { corner: corner4 }];
+    let cornerArray = [{ corner: documentCoords.p1 }, { corner: documentCoords.p2 }, { corner: documentCoords.p3 }, { corner: documentCoords.p4 }];
     //Sort by Y position (to get top-down)
     cornerArray.sort((item1, item2) => { return (item1.corner.y < item2.corner.y) ? -1 : (item1.corner.y > item2.corner.y) ? 1 : 0; }).slice(0, 5);
 
