@@ -11,15 +11,14 @@
   <h2>Document detection</h2>
   <p id="status">OpenCV.js is loading...</p>
   <div>
-    <video style="max-width: 90vw" id="video" playsinline autoplay></video><br />
-    <button id="toggleProcessing">toggle processing</button><br />
+    <video style="width: 90vw" id="video" playsinline autoplay></video><br />
     <canvas style="display:none" id="canvas"></canvas>
   </div>
   <div>
-    <canvas style="max-width: 90vw" id="canvasOutput"></canvas>
+    <canvas style="width: 90vw" id="canvasOutput"></canvas>
   </div>
   <div>
-    <canvas style="max-width: 90vw" id="transformedOutput"></canvas>
+    <canvas style="width: 90vw" id="transformedOutput"></canvas>
   </div>
   <script type="text/javascript">
     const constraints = {
@@ -54,8 +53,7 @@
       context.drawImage(video, 0, 0);
       window.documentCoords = processImage(canvas);
     }
-    const toggleProcessing = document.getElementById("toggleProcessing");
-    toggleProcessing.addEventListener('click', () => {
+    document.getElementById("video").addEventListener('click', () => {
       conversionOn = !conversionOn;
     });
     captureVideo();
@@ -76,6 +74,8 @@
       const canvas = document.getElementById('canvas');
       const src = cv.imread(canvas);
       cutOutDocument(src, window.documentCoords);
+      conversionOn = false;
+      videoOn = false;
     });
 
   </script>
