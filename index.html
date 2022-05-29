@@ -13,20 +13,21 @@
   <div>
     <video style="max-width: 90vw" id="video" playsinline autoplay></video><br />
     <button id="toggleProcessing">toggle processing</button><br />
-    <canvas style="display:none" id="canvas" width="1280" height="720"></canvas>
+    <canvas style="display:none" id="canvas"></canvas>
   </div>
   <div>
-    <canvas id="canvasOutput" style="max-width: 90vw;"></canvas>
+    <canvas id="canvasOutput"></canvas>
   </div>
   <div>
-    <canvas id="transformedOutput" style="max-width: 90vw;"></canvas>
+    <canvas id="transformedOutput"></canvas>
   </div>
   <script type="text/javascript">
     const constraints = {
       audio: false,
       video: {
         facingMode: "environment",
-        width: 1280, height: 720
+        width: {min: 720, max: 1920}, 
+        height: {min: 720, max: 1920}
       }
     };
 
@@ -39,13 +40,18 @@
       window.stream = stream;
       const video = document.getElementById('video');
       video.srcObject = stream;
+      const videoSettings = stream.getVideoTracks()[0].getSettings();
+      const canvas = document.getElementById('canvas');
+      canvas.height = videoSettings.height;
+      canvas.width = videoSettings.width;
+
       videoOn = true;
     }
     function convertCapturedImage() {
       const canvas = document.getElementById('canvas');
       var context = canvas.getContext('2d');
       const video = document.getElementById('video');
-      context.drawImage(video, 0, 0, 1280, 720);
+      context.drawImage(video, 0, 0);
       window.documentCoords = processImage(canvas);
     }
     const toggleProcessing = document.getElementById("toggleProcessing");
@@ -64,7 +70,7 @@
       if (videoOn && opencvReady && conversionOn) {
         convertCapturedImage();
       }
-    }, 1000);
+    }, 2000);
 
     document.getElementById("canvasOutput").addEventListener('click', () => {
       const canvas = document.getElementById('canvas');
