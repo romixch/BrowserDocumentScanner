@@ -10,8 +10,7 @@ const processImage = function (canvas) {
     let ksize = new cv.Size(5, 5);
     cv.GaussianBlur(dst, dst, ksize, 0, 0, cv.BORDER_DEFAULT);
     cv.GaussianBlur(dst, dst, ksize, 0, 0, cv.BORDER_DEFAULT);
-    cv.GaussianBlur(dst, dst, ksize, 0, 0, cv.BORDER_DEFAULT);
-
+    
     // apply canny filter
     cv.Canny(dst, dst, 50, 100, 3, true);
 
@@ -114,4 +113,10 @@ function transform(sourceImage, destinationImage, documentCoords) {
     let dsize = new cv.Size(theWidth, theHeight);
     let M = cv.getPerspectiveTransform(srcCoords, finalDestCoords)
     cv.warpPerspective(sourceImage, destinationImage, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+}
+
+function calculateDownsizeFactor(width, height) {
+    const optimalProcessingPixelCount = 500000;
+    const cameraPixelCount = width * height;
+    return Math.sqrt(cameraPixelCount / optimalProcessingPixelCount);
 }

@@ -43,16 +43,16 @@
       const videoSettings = stream.getVideoTracks()[0].getSettings();
       document.getElementById('video-size').innerText = videoSettings.width + ' x ' + videoSettings.height;
       const canvas = document.getElementById('canvas');
-      canvas.height = videoSettings.height;
-      canvas.width = videoSettings.width;
-
+      const downsizeFactor = calculateDownsizeFactor(videoSettings.height, videoSettings.width);
+      canvas.height = videoSettings.height / downsizeFactor;
+      canvas.width = videoSettings.width / downsizeFactor;
       videoOn = true;
     }
     function convertCapturedImage() {
       const canvas = document.getElementById('canvas');
       var context = canvas.getContext('2d');
       const video = document.getElementById('video');
-      context.drawImage(video, 0, 0);
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
       window.documentCoords = processImage(canvas);
     }
     document.getElementById("video").addEventListener('click', () => {
@@ -70,7 +70,7 @@
       if (videoOn && opencvReady && conversionOn) {
         convertCapturedImage();
       }
-    }, 2000);
+    }, 200);
 
     document.getElementById("canvasOutput").addEventListener('click', () => {
       const canvas = document.getElementById('canvas');
