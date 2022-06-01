@@ -63,11 +63,11 @@ Stimulus.register("document-detection", class extends Controller {
     async convertImage() {
       var context = this.canvasTarget.getContext('2d');
       context.drawImage(this.videoTarget, 0, 0, this.canvasTarget.width, this.canvasTarget.height);
-      this.documentCoords = processImage(this.canvasTarget);
+      this.documentCoords = processImage(this.canvasTarget, this.canvasOutputTarget);
     }
 
     async cutOut() {
       const src = cv.imread(this.canvasTarget);
-      cutOutDocument(src, this.documentCoords);
+      cutOutDocument(src, this.transformedOutputTarget, this.documentCoords);
     }
 })

@@ -1,5 +1,5 @@
-const processImage = function (canvas) {
-    let src = cv.imread(canvas);
+const processImage = function (canvasInput, canvasOutput) {
+    let src = cv.imread(canvasInput);
     let dst = new cv.Mat();
     let origin = src.clone();
 
@@ -33,7 +33,7 @@ const processImage = function (canvas) {
 
     const documentCoords = {};
 
-    if (rectangleContour) {
+    if (rectangleContour && rectangleApprox) {
         var pos = 0;
         documentCoords.p1 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
         documentCoords.p2 = new cv.Point(rectangleApprox.intAt(pos++), rectangleApprox.intAt(pos++));
@@ -48,7 +48,7 @@ const processImage = function (canvas) {
 
 
     // show the image
-    cv.imshow('canvasOutput', origin);
+    cv.imshow(canvasOutput, origin);
     origin.delete();
     src.delete();
     return documentCoords;
@@ -80,10 +80,10 @@ function findBiggestRectangle(contours) {
     return [contours.get(biggestIndex), biggestApprox];
 }
 
-function cutOutDocument(src, documentCoords) {
+function cutOutDocument(src, transformedOutput, documentCoords) {
     let transformedImage = new cv.Mat();
     transform(src, transformedImage, documentCoords);
-    cv.imshow('transformedOutput', transformedImage)
+    cv.imshow(transformedOutput, transformedImage)
     transformedImage.delete();
 }
 
