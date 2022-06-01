@@ -14,76 +14,23 @@
   <h2>Document detection</h2>
   <div data-controller="opencv-loading">
     <p data-opencv-loading-target="loading">OpenCV.js is loading...</p>
-    <div data-opencv-loading-target="loaded"></div>
-    <div>
-      <video style="width: 90vw" id="video" playsinline autoplay></video><br />
-      <span id="video-size"></span>
-      <canvas style="display:none" id="canvas"></canvas>
-    </div>
-    <div>
-      <canvas style="width: 90vw" id="canvasOutput"></canvas>
-    </div>
-    <div>
-      <canvas style="width: 90vw" id="transformedOutput"></canvas>
-    </div>
-    
   </div>
-  <script type="text/javascript">
-    const constraints = {
-      audio: false,
-      video: {
-        facingMode: "environment",
-        width: { min: 1024, ideal: 4096 },
-        height: { min: 1024, ideal: 4096 }
-      }
-    };
+  <div data-controller="document-detection">
+    <button data-action="document-detection#switch" data-document-detection-target="switch">Start</button>
+    <div>
+      <video style="width: 90vw" playsinline autoplay data-document-detection-target="video"></video><br />
+      <span data-document-detection-target="videoSize"></span>
+      <canvas style="display:none" data-document-detection-target="canvas"></canvas>
+    </div>
+    <div>
+      <canvas style="width: 90vw" data-document-detection-target="canvasOutput" data-action="click->document-detection#cutOut"></canvas>
+    </div>
+    <div>
+      <canvas style="width: 90vw" data-document-detection-target="transformedOutput"></canvas>
+    </div>
+  </div>
 
-    let videoOn = false;
-    let opencvReady = false;
-    let conversionOn = false;
-
-    async function captureVideo() {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      window.stream = stream;
-      const video = document.getElementById('video');
-      video.srcObject = stream;
-      const videoSettings = stream.getVideoTracks()[0].getSettings();
-      document.getElementById('video-size').innerText = videoSettings.width + ' x ' + videoSettings.height;
-      const canvas = document.getElementById('canvas');
-      const downsizeFactor = calculateDownsizeFactor(videoSettings.height, videoSettings.width);
-      canvas.height = videoSettings.height / downsizeFactor;
-      canvas.width = videoSettings.width / downsizeFactor;
-      videoOn = true;
-    }
-    function convertCapturedImage() {
-      const canvas = document.getElementById('canvas');
-      var context = canvas.getContext('2d');
-      const video = document.getElementById('video');
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      window.documentCoords = processImage(canvas);
-    }
-    document.getElementById("video").addEventListener('click', () => {
-      conversionOn = !conversionOn;
-    });
-    captureVideo();
-
-    setInterval(() => {
-      if (videoOn && opencvReady && conversionOn) {
-        convertCapturedImage();
-      }
-    }, 200);
-
-    document.getElementById("canvasOutput").addEventListener('click', () => {
-      const canvas = document.getElementById('canvas');
-      const src = cv.imread(canvas);
-      cutOutDocument(src, window.documentCoords);
-      conversionOn = false;
-      videoOn = false;
-    });
-
-  </script>
-  
-  <script defer src="opencv.js" onload="console.log('onload'); window.dispatchEvent(new CustomEvent('opencv-loaded'));"></script>
+  <script defer src="opencv.js" onload="window.dispatchEvent(new CustomEvent('opencv-loaded'));"></script>
   <script async src="document-detection.js" type="text/javascript"></script>
 </body>
 
